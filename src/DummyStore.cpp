@@ -1,18 +1,62 @@
-#include <cstdio>
+#include <algorithm>
+#include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
 
+#include <nix/local-store.hh>
+#include <nix/remote-store.hh>
 #include <nix/store-api.hh>
 
 namespace nix {
 
-static RegisterStoreImplementation regStore([](
-    const std::string & uri, const Store::Params & params)
-    -> std::shared_ptr<Store>
-{
-  printf("Dummy Store registering\n");
-  return nullptr;
-});
+template <class BaseStore> class DummyStore : public BaseStore {
+public:
+  ~DummyStore();
 
+  DummyStore(const Store::Params &params, const std::string &something)
+      : Store(params), BaseStore(params){};
+
+  void buildPaths(const PathSet &paths, BuildMode buildMode) override;
+};
+
+template <class BaseStore> DummyStore<BaseStore>::~DummyStore() {}
+
+template <class BaseStore>
+void DummyStore<BaseStore>::buildPaths(const PathSet &paths,
+                                       BuildMode buildMode) {
+  std::cerr << "buildPaths called for" << std::endl;
+  std::for_each(paths.begin(), paths.end(), [](const Path &path) {
+    std::cerr << "  - " << path << std::endl;
+  });
+
+  BaseStore::buildPaths(paths, buildMode);
+}
+
+static RegisterStoreImplementation
+regStore([](const std::string &uri,
+            const Store::Params &params) -> std::shared_ptr<Store> {
+  const std::string prefix = "dummy://";
+  if (std::string(uri, 0, prefix.length()) != prefix) {
+    return nullptr;
+  }
+
+  const std::string resource(uri, prefix.length());
+
+  switch (getStoreType(resource, get(params, "state", settings.nixStateDir))) {
+  case tDaemon:
+    std::cerr
+        << "Registering dummy store with UDSRemoteStore (daemon) underneath"
+        << std::endl;
+    return std::shared_ptr<Store>(
+        std::make_shared<DummyStore<UDSRemoteStore>>(params, ""));
+  case tLocal:
+    std::cerr << "Registering dummy store with LocalStore underneath"
+              << std::endl;
+    return std::shared_ptr<Store>(
+        std::make_shared<DummyStore<LocalStore>>(params, ""));
+  default:
+    return nullptr;
+  }
+});
 };
