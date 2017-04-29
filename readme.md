@@ -36,7 +36,7 @@ Assuming `libdummy-store.dylib` is in the current directory: run
 This is the output of building this project with the dummy store enabled:
 
 ```
-$ LD_PRELOAD=result/lib/dummy-store/libdummy-store.so NIX_REMOTE=dummy:// nix-build
+$ LD_PRELOAD=result/lib/libdummy-store.so NIX_REMOTE=dummy:// nix-build
 Registering dummy store with UDSRemoteStore (daemon) underneath
 Registering dummy store with UDSRemoteStore (daemon) underneath
 Registering dummy store with UDSRemoteStore (daemon) underneath

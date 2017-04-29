@@ -17,7 +17,7 @@ add_library(${PROJECT_NAME} SHARED ${SOURCES})
 target_link_libraries(${PROJECT_NAME} nixstore)
 
 # Install library
-install(TARGETS ${PROJECT_NAME} DESTINATION lib/${PROJECT_NAME})
+install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 
 # Install library headers
 file(GLOB HEADERS include/*.h)
