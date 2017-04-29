@@ -30,3 +30,16 @@ Assuming `libdummy-store.dylib` is in the current directory: run
 
 - To force a local store run with `NIX_REMOTE=dummy://local`.
 - To force a daemon accessed store run with `NIX_REMOTE=dummy://daemon`
+
+### Example output
+
+This is the output of building this project with the dummy store enabled:
+
+```
+$ LD_PRELOAD=result/lib/dummy-store/libdummy-store.so NIX_REMOTE=dummy:// nix-build
+Registering dummy store with UDSRemoteStore (daemon) underneath
+Registering dummy store with UDSRemoteStore (daemon) underneath
+Registering dummy store with UDSRemoteStore (daemon) underneath
+buildPaths called for
+  - /nix/store/qdl7syal8b21iwy0bb04ydfzx8fi5fyi-dummy-store.drv!out
+```
