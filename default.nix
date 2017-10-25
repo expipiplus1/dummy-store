@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> { inherit system; }, system ? builtins.currentSystem }:
 
 let p = { stdenv, fetchurl, cmake, nixUnstable, boost }:
         stdenv.mkDerivation rec {

@@ -18,6 +18,9 @@ public:
       : Store(params), BaseStore(params){};
 
   void buildPaths(const PathSet &paths, BuildMode buildMode) override;
+  BuildResult buildDerivation(const Path & drvPath, const BasicDerivation & drv,
+      BuildMode buildMode = bmNormal) override;
+  void ensurePath(const Path &path) override;
 };
 
 template <class BaseStore> DummyStore<BaseStore>::~DummyStore() {}
@@ -32,6 +35,26 @@ void DummyStore<BaseStore>::buildPaths(const PathSet &paths,
 
   BaseStore::buildPaths(paths, buildMode);
 }
+
+template <class BaseStore>
+BuildResult DummyStore<BaseStore>::buildDerivation(const Path & drvPath, const BasicDerivation & drv, BuildMode buildMode) {
+  std::cerr << "buildDerivation called for" << std::endl;
+  std::cerr << "  - " << drvPath << std::endl;
+
+  return BaseStore::buildDerivation(drvPath, drv, buildMode);
+};
+
+template <class BaseStore>
+void DummyStore<BaseStore>::ensurePath(const Path &path) {
+  std::cerr << "ensurePath called for" << std::endl;
+  std::cerr << "  - " << path << std::endl;
+
+  BaseStore::ensurePath(path);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Register the store
+////////////////////////////////////////////////////////////////////////////////
 
 static RegisterStoreImplementation
 regStore([](const std::string &uri,
